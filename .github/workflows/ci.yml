@@ -39,7 +39,7 @@ jobs:
           test -f SKILL.md
           test -f antipatterns.skill
 
-      - name: Validate relative Markdown links
+      - name: Validate in-repository Markdown links
         shell: bash
         run: |
           python - <<'PY'
@@ -60,7 +60,8 @@ jobs:
                   try:
                       resolved.relative_to(root)
                   except ValueError:
-                      bad.append((md, raw))
+                      # GitHub-relative navigation such as ../../releases is
+                      # outside the checkout and is not an in-repo file link.
                       continue
                   if not resolved.exists():
                       bad.append((md, raw))
@@ -68,4 +69,5 @@ jobs:
               for md, raw in bad:
                   print(f'{md}: {raw}')
               raise SystemExit(1)
+          print('All in-repository Markdown links resolve.')
           PY
